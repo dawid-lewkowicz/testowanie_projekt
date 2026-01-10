@@ -1,0 +1,11 @@
+name: BDD Tests
+on: [push, pull_request]
+jobs:
+  bdd-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: behave tests/bdd/features/scenario.feature
