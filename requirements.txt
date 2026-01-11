@@ -1,7 +1,7 @@
-fastapi
-uvicorn
-pydantic
-requests
+flask
 pytest
 pytest-mock
+pytest-cov
 behave
+locust
+requests
