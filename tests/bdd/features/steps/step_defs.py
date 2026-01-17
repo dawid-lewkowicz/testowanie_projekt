@@ -1,6 +1,5 @@
 from behave import given, when, then
 from app import services
-from app.models import Car, User
 
 @given('Mamy dostępne auto marki "{brand}" o cenie {price:d} i VIN "{vin}"')
 def step_impl(context, brand, price, vin):
@@ -19,12 +18,25 @@ def step_impl(context, username, balance):
 
 @when('Użytkownik kupuje to auto')
 def step_impl(context):
-    context.transaction = services.buy_car(context.user.id, context.car.id)
+    try:
+        context.transaction = services.buy_car(context.user.id, context.car.id)
+        context.error = None 
+    except ValueError as e:
+        context.error = str(e)
 
 @then('Auto zostaje oznaczone jako sprzedane')
 def step_impl(context):
     assert context.car.is_sold is True
 
+@then('Auto nie zostaje oznaczone jako sprzedane')
+def step_impl(context):
+    assert context.car.is_sold is False
+
 @then('Stan konta użytkownika wynosi {balance:d}')
 def step_impl(context, balance):
     assert context.user.wallet_balance == balance
+
+@then('Operacja kończy się błędem "{message}"')
+def step_impl(context, message):
+    assert context.error is not None, "Oczekiwano błędu, ale operacja się powiodła"
+    assert context.error == message
