@@ -9,7 +9,7 @@ class CarDealerUser(HttpUser):
     user_id = None
     wallet_balance = 10000000 
 
-    real_cars_templates = [
+    real_cars_template = [
         {"brand": "BMW", "model": "M3", "year": 2023, "price": 450000},
         {"brand": "Audi", "model": "RS6", "year": 2022, "price": 600000},
         {"brand": "Toyota", "model": "Corolla", "year": 2024, "price": 120000}
@@ -29,7 +29,7 @@ class CarDealerUser(HttpUser):
 
     @task(2)
     def add_valid_car(self):
-        car_data = random.choice(self.real_cars_templates).copy()
+        car_data = random.choice(self.real_cars_template).copy()
         car_data["vin"] = "123ABC_CLEAN"
         self.client.post("/cars", json=car_data)
 
@@ -41,7 +41,10 @@ class CarDealerUser(HttpUser):
         response = self.client.get("/cars")
         if response.status_code == 200:
             cars = response.json()
-            available = [c for c in cars if not c.get('is_sold')]
+            available = []
+            for c in cars:
+                if not c.get('is_sold'):
+                    available.append(c)
             if available:
                 target = random.choice(available)
                 self.client.post(f"/buy/{self.user_id}/{target['id']}")

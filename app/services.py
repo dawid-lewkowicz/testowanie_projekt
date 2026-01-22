@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict, Optional
 from app.models import Car, User, Transaction
 from app.external_service import verify_vehicle_history
 
