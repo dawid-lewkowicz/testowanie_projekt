@@ -25,7 +25,7 @@ def test_user_model_creation():
     
     assert user.id == 1
     assert user.username == "Dawid"
-    assert user.wallet_balance == 150000.0
+    assert user.wallet_balance == 150000
 
 def test_transaction_model_creation():
     now = datetime.now()

@@ -52,11 +52,7 @@ def test_buy_car_success_flow(mocker):
     assert user.wallet_balance == 50000
     assert car.is_sold is True
 
-@pytest.mark.parametrize("setup_func, expected_error", [
-    (lambda u, c: setattr(c, 'is_sold', True), "Auto jest już sprzedane"),
-    (lambda u, c: setattr(u, 'wallet_balance', 1000), "Niewystarczające środki na koncie"),
-])
-def test_buy_car_business_failures(mocker, setup_func, expected_error):
+def test_buy_car_fails_when_car_is_sold(mocker):
     car = services.add_car({
         "brand": "Mazda", "model": "6", "year": 2022, 
         "price": 140000, "vin": "123ABC_CLEAN"
@@ -65,11 +61,27 @@ def test_buy_car_business_failures(mocker, setup_func, expected_error):
         "username": "Dawid", "wallet_balance": 200000
     })
     
-    setup_func(user, car)
-
+    car.is_sold = True
+    
     mocker.patch("app.services.verify_vehicle_history", return_value=True)
 
-    with pytest.raises(ValueError, match=expected_error):
+    with pytest.raises(ValueError, match="Auto jest już sprzedane"):
+        services.buy_car(user.id, car.id)
+
+def test_buy_car_fails_when_no_funds(mocker):
+    car = services.add_car({
+        "brand": "Mazda", "model": "6", "year": 2022, 
+        "price": 140000, "vin": "123ABC_CLEAN"
+    })
+    user = services.register_user({
+        "username": "Dawid", "wallet_balance": 200000
+    })
+    
+    user.wallet_balance = 1000
+    
+    mocker.patch("app.services.verify_vehicle_history", return_value=True)
+
+    with pytest.raises(ValueError, match="Niewystarczające środki na koncie"):
         services.buy_car(user.id, car.id)
 
 def test_buy_car_stolen_vin(mocker):
