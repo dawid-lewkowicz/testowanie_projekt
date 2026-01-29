@@ -97,3 +97,24 @@ def test_buy_car_stolen_vin(mocker):
 
     with pytest.raises(ValueError, match="Auto ma wypadkową historię"):
         services.buy_car(user.id, car.id)
+
+def test_buy_car_user_not_found(mocker):
+    car = services.add_car({
+        "brand": "Fiat", "model": "Panda", "year": 2015, 
+        "price": 15000, "vin": "123ABC_CLEAN"
+    })
+    
+    mocker.patch("app.services.verify_vehicle_history", return_value=True)
+
+    with pytest.raises(ValueError, match="Nie znaleziono użytkownika"):
+        services.buy_car(999, car.id)
+
+def test_buy_car_vehicle_not_found(mocker):
+    user = services.register_user({
+        "username": "Dawid", "wallet_balance": 50000
+    })
+    
+    mocker.patch("app.services.verify_vehicle_history", return_value=True)
+
+    with pytest.raises(ValueError, match="Nie znaleziono auta"):
+        services.buy_car(user.id, 999)

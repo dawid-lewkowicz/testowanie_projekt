@@ -76,3 +76,26 @@ def test_buy_car_success_flow(client):
     
     assert res.status_code == 200
     assert res.get_json()['transaction']['final_price'] == 1000
+
+def test_create_user_success(client):
+    payload = {"username": "Dawid", "wallet_balance": 5000}
+    response = client.post('/users', json=payload)
+    
+    assert response.status_code == 201
+    data = response.get_json()
+    assert data['username'] == "Dawid"
+    assert data['wallet_balance'] == 5000
+    assert 'id' in data
+
+def test_buy_car_api_not_found_entities(client):
+    response = client.post('/buy/999/999')
+    
+    assert response.status_code == 400
+    assert "Nie znaleziono użytkownika" in response.get_json()['error']
+
+def test_create_car_missing_fields(client):
+    payload = {"brand": "Audi", "model": "A4", "year": 2020, "vin": "123ABC_CLEAN"}
+    response = client.post('/cars', json=payload)
+    
+    assert response.status_code == 400
+    assert "Cena musi być większa niż zero" in response.get_json()['error']
