@@ -40,3 +40,16 @@ def step_impl(context, balance):
 def step_impl(context, message):
     assert context.error is not None, "Oczekiwano błędu, ale operacja się powiodła"
     assert context.error == message
+
+@when('Użytkownik sprawdza listę aut')
+def step_impl(context):
+    context.car_list = services.cars_db
+
+@then('Na liście znajduje się auto marki "{brand}"')
+def step_impl(context, brand):
+    found = False
+    for car in context.car_list:
+        if car.brand == brand:
+            found = True
+            break
+    assert found is True

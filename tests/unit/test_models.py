@@ -42,3 +42,11 @@ def test_transaction_model_creation():
     assert transaction.car_id == 5
     assert transaction.final_price == 340000
     assert transaction.sale_date == now
+
+def test_car_default_value():
+    car = Car(id=1, brand="Kia", model="Ceed", year=2020, price=50000, vin="123ABC_CLEAN")
+    assert car.is_sold is False
+
+def test_user_default_value():
+    user = User(id=1, username="Dawid", wallet_balance=100)
+    assert user.is_active is True
